@@ -22,7 +22,7 @@ export const CONFIG = {
    * ★★ 数据版本号 —— 改完 txt 后把它 +1,可以绕开 GitHub Pages 的 CDN 缓存立刻生效。
    * 忘记改也没关系,最多等约 10 分钟缓存自然过期。
    */
-  dataVersion: '2',
+  dataVersion: '3',
 
   /** localStorage 键名,换名会清空用户已保存的偏好 */
   storagePrefix: 'yuneko-quotes:',
