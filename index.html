@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>猫娘语录集</title>
+<meta name="description" content="卡拉彼丘 · 喵言喵语收藏所 —— 点一下,把语录复制走喵。" />
+<meta name="theme-color" id="theme-color-meta" content="#fdf6ff" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%90%BE%3C/text%3E%3C/svg%3E" />
+
+<link rel="stylesheet" href="css/variables.css" />
+<link rel="stylesheet" href="css/base.css" />
+<link rel="stylesheet" href="css/layout.css" />
+<link rel="stylesheet" href="css/components.css" />
+
+<!-- 这一段要在所有脚本之前跑:定主题 + 老浏览器检测 + 尽早挂上错误捕获 -->
+<script>
+  /* 0) 全局错误捕获 —— 页面崩了的时候,兜底提示能说出真实原因,而不是干巴巴一句"失败了" */
+  window.__YUNEKO_ERRORS = [];
+  window.__YUNEKO_BOOTED = false;
+
+  window.onerror = function (msg, src, line, col, err) {
+    window.__YUNEKO_ERRORS.push({
+      type: 'error',
+      msg: String(msg),
+      where: (src ? String(src).split('/').pop() : '?') + ':' + line + ':' + col,
+      stack: err && err.stack ? String(err.stack).slice(0, 500) : ''
+    });
+    return false;
+  };
+
+  try {
+    window.addEventListener('unhandledrejection', function (e) {
+      var r = e && e.reason;
+      window.__YUNEKO_ERRORS.push({
+        type: 'reject',
+        msg: r && r.message ? String(r.message) : String(r),
+        where: 'promise',
+        stack: r && r.stack ? String(r.stack).slice(0, 500) : ''
+      });
+    });
+  } catch (e) { /* 老浏览器没有这个事件,忽略 */ }
+
+  /* 1) 主题(尽早定,防止进页面闪白) */
+  (function () {
+    var THEME = 'light';
+    try {
+      var saved = localStorage.getItem('yuneko-quotes:theme');
+      if (saved === 'light' || saved === 'dark') {
+        THEME = saved;
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        THEME = 'dark';
+      }
+    } catch (e) { /* 隐私模式下 localStorage 会抛异常,忽略 */ }
+    document.documentElement.setAttribute('data-theme', THEME);
+    var meta = document.getElementById('theme-color-meta');
+    if (meta) meta.setAttribute('content', THEME === 'dark' ? '#14101d' : '#fdf6ff');
+  })();
+
+  /* 2) 老浏览器兜底:flex 布局的 gap 要 Chrome 84+,
+        不支持时给 <html> 挂个类,CSS 里用 margin 顶上 */
+  (function () {
+    try {
+      var probe = document.createElement('div');
+      probe.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute;visibility:hidden;';
+      probe.appendChild(document.createElement('div'));
+      probe.appendChild(document.createElement('div'));
+      (document.body || document.documentElement).appendChild(probe);
+      var supported = probe.scrollHeight === 1;
+      probe.parentNode.removeChild(probe);
+      if (!supported) document.documentElement.className += ' no-flex-gap';
+    } catch (e) { /* 检测失败就当支持,不影响主流程 */ }
+  })();
+</script>
+</head>
+
+<body>
+  <!-- 背景渐变光斑(纯装饰) -->
+  <div class="bg-orbs" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-paw" aria-hidden="true">🐾</span>
+        <div class="brand-text">
+          <h1 class="brand-title" id="site-title">猫娘语录集</h1>
+          <p class="brand-subtitle" id="site-subtitle">卡拉彼丘 · 喵言喵语收藏所</p>
+        </div>
+      </div>
+      <button type="button" class="icon-btn" id="theme-toggle" title="切换深浅色主题" aria-label="切换深浅色主题">🌙</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="toolbar">
+      <div class="search-field">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input id="search-input" class="search-input" type="search" placeholder="搜索语录…"
+               autocomplete="off" spellcheck="false" aria-label="搜索语录" />
+        <button type="button" class="search-clear" id="search-clear" aria-label="清空搜索" hidden>✕</button>
+      </div>
+      <p class="counter" id="counter" aria-live="polite"></p>
+    </div>
+
+    <nav class="tag-bar" id="tag-bar" aria-label="角色标签筛选" hidden></nav>
+
+    <section id="quote-list" class="quote-grid" aria-label="语录列表"></section>
+
+    <p class="empty" id="empty-state" hidden>没有找到匹配的语录喵…换个词试试?</p>
+  </main>
+
+  <div class="fab-group">
+    <label class="switch-chip" for="nsfw-switch" title="开启后「随机一条」可能抽到擦边语录">
+      <input type="checkbox" id="nsfw-switch" class="switch-input" />
+      <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+      <span class="switch-label">随机含擦边</span>
+    </label>
+    <button type="button" class="fab" id="random-btn"><span aria-hidden="true">🎲</span> 随机一条</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ★ 内联 style 兜底:CSS 万一没加载或优先级出问题,它也一定是藏着的 -->
+  <div class="boot-error" id="boot-error" style="display:none">
+    <div class="boot-error-card">
+      <h2 id="boot-error-title">唔…加载失败了喵</h2>
+      <p id="boot-error-msg"></p>
+      <p class="boot-error-hint" id="boot-error-hint"></p>
+      <details class="boot-error-diag" id="boot-error-diag" hidden>
+        <summary>诊断信息(点开)</summary>
+        <pre id="boot-error-diag-body"></pre>
+      </details>
+    </div>
+  </div>
+
+  <noscript>
+    <p class="noscript">这个页面需要开启 JavaScript 才能加载语录喵。</p>
+  </noscript>
+
+  <script type="module" src="js/main.js"></script>
+
+  <!-- 兜底:模块没能跑起来时(旧 WebView 不支持 ES 模块、file:// 协议、路径不对……)
+       给用户一句人话 + 真实的错误原因,而不是对着白屏发呆 -->
+  <script>
+    setTimeout(function () {
+      // 主脚本自己已经报过错 → 让它自己显示(那条信息更具体),这里只处理"完全没动静"
+      if (window.__YUNEKO_BOOTED) return;
+      if (window.__YUNEKO_ERROR_SHOWN) return;
+
+      var box = document.getElementById('boot-error');
+      var title = document.getElementById('boot-error-title');
+      var msg = document.getElementById('boot-error-msg');
+      var hint = document.getElementById('boot-error-hint');
+      var diag = document.getElementById('boot-error-diag');
+      var diagBody = document.getElementById('boot-error-diag-body');
+      if (!box) return;
+
+      var isFile = location.protocol === 'file:';
+      var errors = window.__YUNEKO_ERRORS || [];
+
+      title.textContent = isFile ? '唔…本地打开读不到语录喵' : '唔…页面没能启动喵';
+
+      if (errors.length) {
+        msg.textContent = '脚本报错了:' + errors[0].msg;
+      } else {
+        msg.textContent = isFile
+          ? '浏览器不允许 file:// 直接加载 ES 模块和 txt 文件,这是安全限制,不是页面坏了。'
+          : '脚本完全没跑起来,通常是容器的浏览器不支持 ES 模块,或者文件路径不对。';
+      }
+
+      hint.innerHTML = isFile
+        ? '<b>解决办法(任选其一):</b><br>' +
+          '1. 改用<b>单文件离线版</b> yuneko-quotes-standalone.html(双击即可,推荐)<br>' +
+          '2. 在本目录执行 <code>python3 -m http.server 8000</code>,<br>' +
+          '&nbsp;&nbsp;&nbsp;然后访问 <code>http://localhost:8000</code><br>' +
+          '3. 部署到 GitHub Pages 后用网址打开'
+        : '<b>可能的原因:</b><br>' +
+          '· 容器的浏览器太旧,不支持 ES 模块(建议改用<b>单文件离线版</b>)<br>' +
+          '· js/ 目录没上传完整,或者路径大小写不对<br>' +
+          '· 服务器没有以正确方式提供 .js 文件(MIME 类型不对)';
+
+      // 诊断信息:环境 + 收集到的错误
+      if (diag && diagBody) {
+        var lines = [];
+        lines.push('protocoa: ' + location.protocol);
+        lines.push('href    : ' + location.href);
+        lines.push('UA      : ' + navigator.userAgent);
+        lines.push('ES模块  : ' + (function () {
+          try { new Function('import("data:text/javascript,")'); return '语法可用'; }
+          catch (e) { return '不支持(' + e.message + ')'; }
+        })());
+        lines.push('fetch   : ' + (typeof fetch === 'function' ? '有' : '没有'));
+        lines.push('clipboard: ' + (navigator.clipboard ? '有' : '没有'));
+        lines.push('localStorage: ' + (function () {
+          try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); return '可用'; }
+          catch (e) { return '不可用'; }
+        })());
+        lines.push('');
+        lines.push('捕获到的错误 (' + errors.length + ' 条):');
+        if (!errors.length) {
+          lines.push('  (无 —— 说明连错误都没抛,可能脚本压根没被请求)');
+        }
+        for (var i = 0; i < errors.length; i++) {
+          lines.push('  [' + (i + 1) + '] ' + errors[i].type + ' @ ' + errors[i].where);
+          lines.push('      ' + errors[i].msg);
+          if (errors[i].stack) lines.push('      ' + errors[i].stack);
+        }
+        diagBody.textContent = lines.join('\n');
+        diag.hidden = false;
+      }
+
+      box.style.display = 'grid';   // 显式打开,不依赖 hidden 属性
+    }, 2500);
+  </script>
+</body>
+</html>
