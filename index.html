@@ -99,7 +99,7 @@
     <div class="toolbar">
       <div class="search-field">
         <span class="search-icon" aria-hidden="true">🔍</span>
-        <input id="search-input" class="search-input" type="search" placeholder="搜索语录…"
+        <input id="search-input" class="search-input" type="search" placeholder="搜索语录..."
                autocomplete="off" spellcheck="false" aria-label="搜索语录" />
         <button type="button" class="search-clear" id="search-clear" aria-label="清空搜索" hidden>✕</button>
       </div>
@@ -110,7 +110,7 @@
 
     <section id="quote-list" class="quote-grid" aria-label="语录列表"></section>
 
-    <p class="empty" id="empty-state" hidden>没有找到匹配的语录喵…换个词试试?</p>
+    <p class="empty" id="empty-state" hidden>没有找到匹配的语录喵...换个词试试?</p>
   </main>
 
   <div class="fab-group">
@@ -127,7 +127,7 @@
   <!-- ★ 内联 style 兜底:CSS 万一没加载或优先级出问题,它也一定是藏着的 -->
   <div class="boot-error" id="boot-error" style="display:none">
     <div class="boot-error-card">
-      <h2 id="boot-error-title">唔…加载失败了喵</h2>
+      <h2 id="boot-error-title">唔...加载失败了喵</h2>
       <p id="boot-error-msg"></p>
       <p class="boot-error-hint" id="boot-error-hint"></p>
       <details class="boot-error-diag" id="boot-error-diag" hidden>
@@ -143,7 +143,7 @@
 
   <script type="module" src="js/main.js"></script>
 
-  <!-- 兜底:模块没能跑起来时(旧 WebView 不支持 ES 模块、file:// 协议、路径不对……)
+  <!-- 兜底:模块没能跑起来时(旧 WebView 不支持 ES 模块、file:// 协议、路径不对...)
        给用户一句人话 + 真实的错误原因,而不是对着白屏发呆 -->
   <script>
     setTimeout(function () {
@@ -162,7 +162,7 @@
       var isFile = location.protocol === 'file:';
       var errors = window.__YUNEKO_ERRORS || [];
 
-      title.textContent = isFile ? '唔…本地打开读不到语录喵' : '唔…页面没能启动喵';
+      title.textContent = isFile ? '唔...本地打开读不到语录喵' : '唔...页面没能启动喵';
 
       if (errors.length) {
         msg.textContent = '脚本报错了:' + errors[0].msg;
