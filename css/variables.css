@@ -1,0 +1,92 @@
+/* ==========================================================================
+   variables.css — 设计变量(配色 / 圆角 / 间距 / 动效)
+   想改整体风格,只需要动这一个文件
+   ========================================================================== */
+
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC",
+    system-ui, sans-serif;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --dur-fast: 0.14s;
+  --dur: 0.24s;
+  --ease: cubic-bezier(0.34, 1.15, 0.64, 1);
+
+  /* 品牌色(两种主题共用) */
+  --brand-pink: #ff7ab6;
+  --brand-purple: #a78bfa;
+  --brand-blue: #7dd3fc;
+}
+
+/* ---------------------------- 亮色(默认) ---------------------------- */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #fdf6ff;
+  --orb-1: rgba(255, 122, 182, 0.34);
+  --orb-2: rgba(167, 139, 250, 0.32);
+  --orb-3: rgba(125, 211, 252, 0.24);
+
+  --text: #3b2c47;
+  --text-dim: #75658a;
+  --text-faint: #9c8cae;
+
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-solid: #ffffff;
+  --border: rgba(255, 255, 255, 0.92);
+  --border-soft: rgba(167, 139, 250, 0.22);
+  --shadow: 0 12px 30px -14px rgba(122, 82, 170, 0.35);
+  --shadow-hover: 0 20px 44px -16px rgba(122, 82, 170, 0.45);
+  --shadow-fab: 0 14px 30px -10px rgba(255, 122, 182, 0.55);
+
+  --accent: #b06ae0;
+  --accent-soft: rgba(176, 106, 224, 0.12);
+  --ring: rgba(176, 106, 224, 0.4);
+  --ok: #21a97a;
+
+  --switch-off: rgba(140, 125, 165, 0.3);
+  --toast-bg: rgba(52, 38, 70, 0.92);
+}
+
+/* ---------------------------- 暗色 ---------------------------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #14101d;
+  --orb-1: rgba(255, 122, 182, 0.22);
+  --orb-2: rgba(139, 92, 246, 0.26);
+  --orb-3: rgba(56, 189, 248, 0.16);
+
+  --text: #ece7f5;
+  --text-dim: #b4a8c6;
+  --text-faint: #7f7392;
+
+  --surface: rgba(38, 30, 52, 0.7);
+  --surface-solid: #241c33;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-soft: rgba(255, 255, 255, 0.07);
+  --shadow: 0 14px 34px -16px rgba(0, 0, 0, 0.75);
+  --shadow-hover: 0 22px 46px -18px rgba(0, 0, 0, 0.8);
+  --shadow-fab: 0 16px 34px -12px rgba(255, 122, 182, 0.4);
+
+  --accent: #c79bf5;
+  --accent-soft: rgba(199, 155, 245, 0.14);
+  --ring: rgba(199, 155, 245, 0.45);
+  --ok: #4cd7a5;
+
+  --switch-off: rgba(255, 255, 255, 0.16);
+  --toast-bg: rgba(20, 14, 30, 0.92);
+}

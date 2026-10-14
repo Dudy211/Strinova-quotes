@@ -1,0 +1,176 @@
+/* ==========================================================================
+   base.css — 基础重置 / 页面底色 / 背景光斑 / 通用元素
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;   /* 支持的话用动态视口高度,不支持时上面那行兜底 */
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, p, figure {
+  margin: 0;
+}
+
+/* ★★★ 关键:hidden 属性必须真的隐藏。
+   浏览器默认的 [hidden] { display: none } 是元素选择器+属性选择器(权重 0,1,0),
+   而本项目的 .boot-error / .search-clear / .tag-bar 都写了 display: grid|flex(同样 0,1,0),
+   且声明在更后面 → 会把默认规则盖掉,导致「设了 hidden 却照样显示」。
+   这里显式提权,一劳永逸。 */
+[hidden] {
+  display: none !important;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+/* 滚动条懒得美化太多,只把宽度收窄 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--accent-soft); }
+
+/* ---------------------------- 背景光斑 ---------------------------- */
+.bg-orbs {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  will-change: transform;
+}
+
+.orb-1 {
+  width: 46vmax; height: 46vmax;
+  top: -14vmax; left: -10vmax;
+  background: var(--orb-1);
+  animation: orb-drift-a 26s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 38vmax; height: 38vmax;
+  bottom: -12vmax; right: -8vmax;
+  background: var(--orb-2);
+  animation: orb-drift-b 32s ease-in-out infinite;
+}
+
+.orb-3 {
+  width: 30vmax; height: 30vmax;
+  top: 36%; left: 50%;
+  background: var(--orb-3);
+  animation: orb-drift-a 38s ease-in-out infinite reverse;
+}
+
+@keyframes orb-drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(4vmax, 3vmax, 0) scale(1.08); }
+}
+
+@keyframes orb-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.04); }
+  50%      { transform: translate3d(-5vmax, -3vmax, 0) scale(0.96); }
+}
+
+/* ---------------------------- 无障碍 ---------------------------- */
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.noscript {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow);
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ==========================================================================
+   老浏览器兜底:不支持 flex 布局的 gap 时(Chrome < 84 / 老 WebView),
+   由 index.html 的能力检测给 <html> 加上 .no-flex-gap,这里用 margin 顶上。
+   支持 gap 的浏览器完全不会读到这些规则。
+
+   两种情形分开处理:
+     · 单行 flex(row / column)→ 相邻兄弟加 margin
+     · 会换行的 flex-wrap    → 用「均给右边和下边间距 + 容器负下边距」抵消
+   ========================================================================== */
+
+/* --- 单行:横向 --- */
+.no-flex-gap .brand > * + * { margin-left: var(--space-3); }
+.no-flex-gap .topbar-inner > * + * { margin-left: var(--space-4); }
+.no-flex-gap .toolbar > * + * { margin-left: var(--space-4); }
+.no-flex-gap .card-foot > * + * { margin-left: var(--space-3); }
+.no-flex-gap .switch-chip > * + * { margin-left: var(--space-2); }
+.no-flex-gap .fab > * + * { margin-left: var(--space-2); }
+
+/* --- 单行:纵向 --- */
+.no-flex-gap .fab-group > * + * { margin-top: var(--space-3); }
+.no-flex-gap .quote-card > * + * { margin-top: var(--space-3); }
+
+/* --- 会换行:标签行 / 标签栏 --- */
+.no-flex-gap .tag-row { margin-bottom: -6px; }
+.no-flex-gap .tag-row > * { margin: 0 6px 6px 0; }
+
+.no-flex-gap .tag-bar { margin-bottom: calc(var(--space-4) - var(--space-2)); }
+.no-flex-gap .tag-bar > * { margin: 0 var(--space-2) var(--space-2) 0; }
+
+/* --- 小屏时 toolbar 变竖排,间距方向要跟着换 --- */
+@media (max-width: 640px) {
+  .no-flex-gap .toolbar > * + * { margin-left: 0; margin-top: var(--space-2); }
+}
+
+/* --- 语录网格:不支持 grid 时退化成单列 --- */
+@supports not (display: grid) {
+  .quote-grid { display: block; }
+  .quote-grid > * + * { margin-top: var(--space-4); }
+}
